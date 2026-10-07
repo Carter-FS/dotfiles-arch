@@ -19,8 +19,14 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # --- Personal Customizations ---
 # Editor
-alias nv="nvim"
-alias tutor='claude --agent tutor --disallowedTools "Write,Edit,MultiEdit,NotebookEdit" --permission-mode plan'
+alias nv="vim"
+# Override omarchy default n() which hardcodes nvim
+n() { if [ "$#" -eq 0 ]; then command vim . ; else command vim "$@"; fi; }
+# tutor: drop straight into the SRS tutor agent. Disallow Write/Edit so
+# the agent cannot touch source code; SRS state writes go through the
+# scheduler via Bash and stay allowed.
+unalias tutor 2>/dev/null
+alias tutor='claude --agent tutor --disallowedTools "Write,Edit,MultiEdit,NotebookEdit" --settings '\''{"outputStyle":"Smart Mate"}'\'''
 
 # eza aliases (supplements omarchy defaults)
 alias lt='eza --icons --tree --level=2'

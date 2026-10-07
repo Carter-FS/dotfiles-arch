@@ -17,7 +17,7 @@
 	defaultBranch = master
 
 [core]
-	editor = nvim +16 -c 'startinsert'
+	editor = vim +16 -c 'startinsert'
 	excludesfile = ~/.gitignore_global
 	compression = 9
 	filemode = false
@@ -60,3 +60,11 @@
 
 [alias]
 	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+[credential]
+	helper = store
+[credential "https://github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/usr/bin/gh auth git-credential
