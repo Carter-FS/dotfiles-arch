@@ -56,7 +56,7 @@ alias sync-brain="cd ~/Sync/SecondBrain ; git pull ; git add . ; git commit -am 
 
 # Thumbnail generator
 gen-thumbnail() {
-    (cd /home/carter/Sync/personalCode/gen-thumbnail && .venv/bin/python3 gen_thumbnail.py "$@")
+    (cd /home/carter/Sync/PersonalCode/gen-thumbnail && .venv/bin/python3 gen_thumbnail.py "$@")
 }
 
 # Dotfiles bare repo
