@@ -5,9 +5,9 @@
   "spacing": 0,
   "height": 26,
   "modules-left": ["custom/omarchy", "hyprland/workspaces"],
-  "modules-center": ["clock", "custom/update", "custom/voxtype", "custom/screenrecording-indicator", "custom/idle-indicator", "custom/notification-silencing-indicator"],
+  "modules-center": ["clock", "custom/weather", "custom/update", "custom/voxtype", "custom/screenrecording-indicator", "custom/idle-indicator", "custom/notification-silencing-indicator"],
   "modules-right": [
-    "custom/spotify",
+    "group/pomodoro",
     "custom/cpu-usage",
     "custom/gpu-usage",
     "group/tray-expander",
@@ -58,15 +58,40 @@
     "interval": 3600
   },
 
-  "custom/spotify": {
+  "group/pomodoro": {
+    "orientation": "inherit",
+    "drawer": {
+      "transition-duration": 400,
+      "children-class": "pomodoro-group-item"
+    },
+    "modules": [
+      "custom/pomodoro",
+      "custom/pomodoro-skip",
+      "custom/pomodoro-reset",
+      "custom/pomodoro-settings"
+    ]
+  },
+  "custom/pomodoro": {
     "format": "{}",
     "return-type": "json",
-    "exec": "~/.config/waybar/scripts/spotify.sh",
-    "exec-if": "pgrep spotify",
-    "interval": 3,
-    "on-click": "playerctl -p spotify play-pause",
-    "on-scroll-up": "playerctl -p spotify next",
-    "on-scroll-down": "playerctl -p spotify previous"
+    "exec": "~/.config/waybar/scripts/pomodoro.sh status",
+    "interval": 1,
+    "on-click": "~/.config/waybar/scripts/pomodoro.sh toggle"
+  },
+  "custom/pomodoro-skip": {
+    "format": "󰒭",
+    "tooltip-format": "Skip phase",
+    "on-click": "~/.config/waybar/scripts/pomodoro.sh skip"
+  },
+  "custom/pomodoro-reset": {
+    "format": "󰜉",
+    "tooltip-format": "Reset session",
+    "on-click": "~/.config/waybar/scripts/pomodoro.sh reset"
+  },
+  "custom/pomodoro-settings": {
+    "format": "󰢻",
+    "tooltip-format": "Settings",
+    "on-click": "~/.config/waybar/scripts/pomodoro.sh settings"
   },
   "custom/cpu-usage": {
     "exec": "awk '{u=$2+$4; t=$2+$4+$5; if(NR>1) printf \"%.0f%%\\n\", (u-pu)/(t-pt)*100; pu=u; pt=t}' <(head -1 /proc/stat) <(sleep 1 && head -1 /proc/stat)",
@@ -93,14 +118,21 @@
     "tooltip": false,
     "on-click-right": "omarchy-launch-floating-terminal-with-presentation omarchy-tz-select"
   },
+  "custom/weather": {
+    "exec": "$OMARCHY_PATH/default/waybar/weather.sh",
+    "return-type": "json",
+    "interval": 60,
+    "tooltip": false,
+    "on-click": "notify-send -u low \"$(omarchy-weather-status)\""
+  },
   "network": {
     "format-icons": ["󰤯", "󰤟", "󰤢", "󰤥", "󰤨"],
     "format": "{icon}",
     "format-wifi": "{icon}",
     "format-ethernet": "󰀂",
     "format-disconnected": "󰤮",
-    "tooltip-format-wifi": "{essid} ({frequency} GHz)\n⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}",
-    "tooltip-format-ethernet": "⇣{bandwidthDownBytes}  ⇡{bandwidthUpBytes}",
+    "tooltip-format-wifi": "{essid} ({frequency} GHz)",
+    "tooltip-format-ethernet": "Connected",
     "tooltip-format-disconnected": "Disconnected",
     "interval": 3,
     "spacing": 1,
@@ -120,6 +152,7 @@
     "tooltip-format-charging": "{power:>1.0f}W↑ {capacity}%",
     "interval": 5,
     "on-click": "omarchy-menu power",
+    "on-click-right": "notify-send -u low \"$(omarchy-battery-status)\"",
     "states": {
       "warning": 20,
       "critical": 10
@@ -129,7 +162,9 @@
     "format": "{}",
     "return-type": "json",
     "exec": "~/.config/waybar/scripts/vpn.sh",
-    "interval": 10
+    "on-click": "~/.config/waybar/scripts/vpn.sh toggle",
+    "signal": 11,
+    "interval": 5
   },
   "bluetooth": {
     "format": "",
@@ -166,7 +201,7 @@
     "tooltip": false
   },
   "custom/screenrecording-indicator": {
-    "on-click": "omarchy-cmd-screenrecord",
+    "on-click": "omarchy-capture-screenrecording",
     "exec": "$OMARCHY_PATH/default/waybar/indicators/screen-recording.sh",
     "signal": 8,
     "return-type": "json"

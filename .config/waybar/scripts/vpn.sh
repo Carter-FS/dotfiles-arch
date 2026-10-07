@@ -1,30 +1,34 @@
 #!/bin/bash
+# vpn.sh - status reporter (no args, used by waybar exec) and toggle (toggle arg, used by on-click).
+# Brings up / tears down a ProtonVPN AU WireGuard tunnel via `wg-quick`.
+# Requires: /etc/wireguard/proton-au.conf and a NOPASSWD sudoers rule for
+# `wg-quick up proton-au` and `wg-quick down proton-au` (see /etc/sudoers.d/wg-quick-proton-au).
 
-CACHE_FILE="/tmp/waybar-vpn-country"
-CACHE_MAX_AGE=60
+IFACE="proton-au"
+SIGNAL_NUM=11   # must match "signal" in config.jsonc custom/vpn
 
-if ip link show proton 2>/dev/null | grep -q "UP,LOWER_UP"; then
-    # Connected - get country code (cached)
-    country=""
-    if [[ -f "$CACHE_FILE" ]]; then
-        cache_age=$(( $(date +%s) - $(stat -c %Y "$CACHE_FILE") ))
-        if (( cache_age < CACHE_MAX_AGE )); then
-            country=$(cat "$CACHE_FILE")
-        fi
+is_connected() {
+    ip link show "$IFACE" >/dev/null 2>&1
+}
+
+emit_status() {
+    if is_connected; then
+        printf '{"text": "󰒃 AU", "class": "connected", "tooltip": "ProtonVPN connected (AU) - click to disconnect"}\n'
+    else
+        printf '{"text": "󰌾 --", "class": "disconnected", "tooltip": "ProtonVPN disconnected - click to connect to AU"}\n'
     fi
+}
 
-    if [[ -z "$country" ]]; then
-        country=$(curl -s --max-time 3 https://ipinfo.io/country 2>/dev/null)
-        if [[ -n "$country" && ${#country} -eq 2 ]]; then
-            echo "$country" > "$CACHE_FILE"
-        else
-            country=$(cat "$CACHE_FILE" 2>/dev/null || echo "??")
-        fi
+toggle() {
+    if is_connected; then
+        sudo -n /usr/bin/wg-quick down "$IFACE" >/dev/null 2>&1
+    else
+        sudo -n /usr/bin/wg-quick up "$IFACE" >/dev/null 2>&1
     fi
+    pkill -RTMIN+"$SIGNAL_NUM" waybar 2>/dev/null || true
+}
 
-    echo "{\"text\": \"󰒃 ${country}\", \"class\": \"connected\", \"tooltip\": \"ProtonVPN connected (${country})\"}"
-else
-    # Disconnected
-    rm -f "$CACHE_FILE"
-    echo "{\"text\": \"󰌾 --\", \"class\": \"disconnected\", \"tooltip\": \"ProtonVPN disconnected\"}"
-fi
+case "${1:-status}" in
+    toggle) toggle ;;
+    status|*) emit_status ;;
+esac
