@@ -52,7 +52,6 @@ alias xvs="xclip -selection clipboard -o"
 # Utilities
 alias mkdir='mkdir -p'
 alias x='exit'
-alias sync-brain="cd ~/Sync/SecondBrain ; git pull ; git add . ; git commit -am 'Automated update.' ; git push ; cd -"
 
 # Thumbnail generator
 gen-thumbnail() {
