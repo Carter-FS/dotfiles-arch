@@ -1,6 +1,6 @@
 [user]
-	email = carter@librarian.wiki
-	name = Librarian
+	email = 43100930+Carter-FS@users.noreply.github.com
+	name = Carter Facey-Smith
 	useConfigOnly = true
 	signingkey = ~/.ssh/id_ed25519.pub
 
@@ -35,9 +35,6 @@
 [fetch]
 	prune = true
 
-[safe]
-	directory = *
-
 [push]
 	autoSetupRemote = true
 
@@ -60,7 +57,7 @@
 
 [alias]
 	lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
-[credential]
+[credential "https://huggingface.co"]
 	helper = store
 [credential "https://github.com"]
 	helper = 
